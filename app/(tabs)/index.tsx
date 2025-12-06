@@ -70,6 +70,10 @@ export default function StorytellingScreen() {
     );
   };
 
+  const handleChapterChange = (newChapterNumber: number) => {
+    setCurrentChapter(newChapterNumber);
+  };
+
   const handleExportBook = (bookId: number) => {
     Alert.alert(
       'Export Book',
@@ -193,6 +197,7 @@ export default function StorytellingScreen() {
         chapterNumber={currentChapter}
         onProgressUpdate={handleProgressUpdate}
         onComplete={handleChapterComplete}
+        onChapterChange={handleChapterChange}
       />
     </View>
   );
