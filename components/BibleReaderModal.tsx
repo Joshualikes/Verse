@@ -19,9 +19,6 @@ import {
   Volume2,
   VolumeX,
   Bookmark,
-  Share,
-  Download,
-  Palette,
   Settings,
   Sun,
   Moon,
@@ -54,6 +51,7 @@ interface BibleReaderModalProps {
   chapterNumber: number;
   onProgressUpdate: (bookId: number, chapterNumber: number, progress: number) => void;
   onComplete: (bookId: number, chapterNumber: number) => void;
+  onChapterChange?: (chapterNumber: number) => void;
 }
 
 export function BibleReaderModal({
@@ -62,7 +60,8 @@ export function BibleReaderModal({
   book,
   chapterNumber,
   onProgressUpdate,
-  onComplete
+  onComplete,
+  onChapterChange
 }: BibleReaderModalProps) {
   const [isPlaying, setIsPlaying] = useState(false);
   const [audioEnabled, setAudioEnabled] = useState(true);
@@ -235,29 +234,21 @@ const toggleAudio = async () => {
     setReadingProgress(Math.max(0, Math.min(100, scrollProgress)));
   };
 
-  const exportChapter = () => {
-    Alert.alert(
-      'Export Chapter',
-      `Export ${book?.name} Chapter ${chapterNumber} as PDF?`,
-      [
-        { text: 'Cancel', style: 'cancel' },
-        { 
-          text: 'Export', 
-          onPress: () => {
-            console.log('Exporting chapter:', book?.id, chapterNumber);
-            Alert.alert('Success', 'Chapter exported successfully!');
-          }
-        }
-      ]
-    );
+
+  const handlePreviousChapter = () => {
+    if (book && chapterNumber > 1 && onChapterChange) {
+      setReadingProgress(0);
+      setReadingTime(0);
+      onChapterChange(chapterNumber - 1);
+    }
   };
 
-  const shareChapter = () => {
-    Alert.alert('Share', `Share ${book?.name} Chapter ${chapterNumber} with others?`);
-  };
-
-  const openColoringPage = () => {
-    Alert.alert('Coloring Page', `Open coloring page for ${book?.name} Chapter ${chapterNumber}?`);
+  const handleNextChapter = () => {
+    if (book && chapterNumber < book.chapters && onChapterChange) {
+      setReadingProgress(0);
+      setReadingTime(0);
+      onChapterChange(chapterNumber + 1);
+    }
   };
 
   if (!book) return null;
@@ -392,29 +383,12 @@ const toggleAudio = async () => {
           </TouchableOpacity>
         </View>
 
-        {/* Action Buttons */}
-        <View style={[styles.actionButtons, themeStyles.panel]}>
-          <TouchableOpacity style={styles.actionButton} onPress={openColoringPage}>
-            <Palette color="#FF8C42" size={18} />
-            <Text style={styles.actionButtonText}>Color</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton} onPress={shareChapter}>
-            <Share color="#4A90E2" size={18} />
-            <Text style={styles.actionButtonText}>Share</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={styles.actionButton} onPress={exportChapter}>
-            <Download color="#50C878" size={18} />
-            <Text style={styles.actionButtonText}>Export</Text>
-          </TouchableOpacity>
-        </View>
-
         {/* Navigation */}
         <View style={[styles.navigation, themeStyles.panel]}>
           <TouchableOpacity 
             style={[styles.navButton, chapterNumber <= 1 && styles.disabledNavButton]}
             disabled={chapterNumber <= 1}
+            onPress={handlePreviousChapter}
           >
             <Text style={[styles.navButtonText, chapterNumber <= 1 && styles.disabledNavText]}>
               Previous
@@ -428,6 +402,7 @@ const toggleAudio = async () => {
           <TouchableOpacity 
             style={[styles.navButton, chapterNumber >= book.chapters && styles.disabledNavButton]}
             disabled={chapterNumber >= book.chapters}
+            onPress={handleNextChapter}
           >
             <Text style={[styles.navButtonText, chapterNumber >= book.chapters && styles.disabledNavText]}>
               Next
@@ -593,33 +568,6 @@ const styles = StyleSheet.create({
   },
   bookmarkedButton: {
     backgroundColor: '#4A90E2',
-  },
-  actionButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    marginHorizontal: 16,
-    marginBottom: 8,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  actionButton: {
-    alignItems: 'center',
-    backgroundColor: '#FFF8DC',
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 12,
-    gap: 4,
-  },
-  actionButtonText: {
-    fontSize: 12,
-    color: '#8B4513',
-    fontWeight: '600',
   },
   navigation: {
     flexDirection: 'row',

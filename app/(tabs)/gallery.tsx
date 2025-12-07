@@ -2,31 +2,17 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity, Image, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Menu, Download, CircleCheck as CheckCircle, Play } from 'lucide-react-native';
+import { Download, CircleCheck as CheckCircle, Play } from 'lucide-react-native';
 import { CategoryTabs } from '@/components/CategoryTabs';
 import { ProgressGrid } from '@/components/ProgressGrid';
 import { CompletedGrid } from '@/components/CompletedGrid';
-import { HamburgerMenu } from '@/components/HamburgerMenu';
 
 const { width } = Dimensions.get('window');
 
 export default function GalleryScreen() {
   const [activeCategory, setActiveCategory] = useState('New');
   const [activeSection, setActiveSection] = useState<'progress' | 'completed'>('progress');
-  const [showMenu, setShowMenu] = useState(false);
   const insets = useSafeAreaInsets();
-
-  const handleThemes = () => {
-    console.log('Opening themes...');
-  };
-
-  const handleRewards = () => {
-    console.log('Opening rewards...');
-  };
-
-  const handleCompleted = () => {
-    console.log('Opening completed gallery...');
-  };
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom + 100 }]}>
@@ -38,9 +24,6 @@ export default function GalleryScreen() {
             style={styles.headerImage}
           />
           <View style={styles.headerOverlay}>
-            <TouchableOpacity style={styles.menuButton} onPress={() => setShowMenu(true)}>
-              <Menu color="#FFFFFF" size={24} strokeWidth={2.5} />
-            </TouchableOpacity>
             <Text style={styles.headerTitle}>Gallery</Text>
             <Text style={styles.headerSubtitle}>Your Coloring Journey</Text>
           </View>
@@ -97,14 +80,6 @@ export default function GalleryScreen() {
           </View>
         )}
       </ScrollView>
-
-      <HamburgerMenu
-        visible={showMenu}
-        onClose={() => setShowMenu(false)}
-        onThemes={handleThemes}
-        onRewards={handleRewards}
-        onCompleted={handleCompleted}
-      />
     </View>
   );
 }
@@ -141,14 +116,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 20,
-  },
-  menuButton: {
-    position: 'absolute',
-    top: 20,
-    right: 20,
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 50,
-    padding: 12,
   },
   headerTitle: {
     fontSize: 32,

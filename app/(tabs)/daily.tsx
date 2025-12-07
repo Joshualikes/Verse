@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { Play, Pause, Heart, Share, Volume2, VolumeX, RotateCcw, Menu, Clock, Globe, Settings } from 'lucide-react-native';
+import { Play, Pause, Heart, Share, Volume2, VolumeX, RotateCcw, Clock, Globe, Settings } from 'lucide-react-native';
 import { Audio } from 'expo-av';
-import { HamburgerMenu } from '@/components/HamburgerMenu';
 import { loadingVerses, getRandomVerse } from '@/data/loadingVerses';
 import { getRandomPrayer } from '@/data/randomPrayers';
 
@@ -129,7 +128,6 @@ export default function DailyScreen() {
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [verseSound, setVerseSound] = useState<Audio.Sound | null>(null);
   const [reflectionSound, setReflectionSound] = useState<Audio.Sound | null>(null);
-  const [showMenu, setShowMenu] = useState(false);
   const [language, setLanguage] = useState<'english' | 'tagalog'>('english');
   const [currentDate, setCurrentDate] = useState(new Date());
   const [userTimezone, setUserTimezone] = useState(Intl.DateTimeFormat().resolvedOptions().timeZone);
@@ -264,18 +262,6 @@ export default function DailyScreen() {
     }
   };
 
-  const handleThemes = () => {
-    console.log('Opening themes...');
-  };
-
-  const handleRewards = () => {
-    console.log('Opening rewards...');
-  };
-
-  const handleCompleted = () => {
-    console.log('Opening completed gallery...');
-  };
-
   const formatDateTime = (date: Date, timezone: string) => {
     return new Intl.DateTimeFormat('en-US', {
       weekday: 'long',
@@ -305,9 +291,6 @@ export default function DailyScreen() {
         <View style={styles.header}>
           <Image source={currentVerse.headerImage} style={styles.headerImage} />
           <View style={styles.headerOverlay}>
-            <TouchableOpacity style={styles.menuButton} onPress={() => setShowMenu(true)}>
-              <Menu color="#FFFFFF" size={24} strokeWidth={2.5} />
-            </TouchableOpacity>
             <Text style={styles.headerTitle}>Daily</Text>
             <Text style={styles.headerSubtitle}>Verse</Text>
           </View>
@@ -452,14 +435,6 @@ export default function DailyScreen() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-
-      <HamburgerMenu
-        visible={showMenu}
-        onClose={() => setShowMenu(false)}
-        onThemes={handleThemes}
-        onRewards={handleRewards}
-        onCompleted={handleCompleted}
-      />
     </View>
   );
 }
@@ -496,14 +471,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 40,
-  },
-  menuButton: {
-    position: 'absolute',
-    top: 40,
-    right: 20,
-    backgroundColor: 'rgba(0, 0, 0, 0.3)',
-    borderRadius: 50,
-    padding: 12,
   },
   headerTitle: {
     fontSize: 36,

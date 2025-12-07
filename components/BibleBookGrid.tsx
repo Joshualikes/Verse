@@ -8,14 +8,12 @@ const { width } = Dimensions.get('window');
 const itemWidth = (width - 48) / 2;
 
 interface BibleBookGridProps {
-  selectedTestament: string;
   selectedCategory: string;
   onBookSelect: (book: BibleBook) => void;
   userProgress?: { [key: string]: number };
 }
 
 export function BibleBookGrid({ 
-  selectedTestament, 
   selectedCategory, 
   onBookSelect,
   userProgress = {}
@@ -24,10 +22,6 @@ export function BibleBookGrid({
 
   const getFilteredBooks = () => {
     let filteredBooks = bibleBooks;
-
-    if (selectedTestament !== 'All') {
-      filteredBooks = filteredBooks.filter(book => book.testament === selectedTestament);
-    }
 
     if (selectedCategory !== 'All') {
       const category = bibleCategories.find(cat => cat.name === selectedCategory);

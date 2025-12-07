@@ -31,7 +31,6 @@ interface ChapterListModalProps {
   onClose: () => void;
   book: BibleBook | null;
   onChapterSelect: (bookId: number, chapterNumber: number) => void;
-  onExportBook: (bookId: number) => void;
   userProgress?: { [key: string]: number };
 }
 
@@ -40,7 +39,6 @@ export function ChapterListModal({
   onClose, 
   book, 
   onChapterSelect,
-  onExportBook,
   userProgress = {}
 }: ChapterListModalProps) {
   const [selectedChapters, setSelectedChapters] = useState<number[]>([]);
@@ -101,9 +99,6 @@ export function ChapterListModal({
     return '#50C878';
   };
 
-  const completedChapters = Array.from({ length: book.chapters }, (_, i) => i + 1)
-    .filter(ch => getChapterProgress(ch) >= 100).length;
-
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
       <SafeAreaView style={styles.container}>
@@ -114,41 +109,7 @@ export function ChapterListModal({
           </TouchableOpacity>
           <View style={styles.headerCenter}>
             <Text style={styles.bookTitle}>{book.name}</Text>
-            <Text style={styles.bookSubtitle}>
-              {book.chapters} chapters • {completedChapters} completed
-            </Text>
           </View>
-          <TouchableOpacity 
-            style={styles.bulkButton}
-            onPress={() => setShowBulkActions(!showBulkActions)}
-          >
-            <Text style={styles.bulkButtonText}>Select</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Book Stats */}
-        <View style={styles.statsContainer}>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{book.chapters}</Text>
-            <Text style={styles.statLabel}>Chapters</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>{completedChapters}</Text>
-            <Text style={styles.statLabel}>Completed</Text>
-          </View>
-          <View style={styles.statItem}>
-            <Text style={styles.statValue}>
-              {Math.round((completedChapters / book.chapters) * 100)}%
-            </Text>
-            <Text style={styles.statLabel}>Progress</Text>
-          </View>
-          <TouchableOpacity 
-            style={styles.exportBookButton}
-            onPress={() => onExportBook(book.id)}
-          >
-            <Download color="#FFFFFF" size={16} />
-            <Text style={styles.exportBookText}>Export Book</Text>
-          </TouchableOpacity>
         </View>
 
         {/* Bulk Actions */}
@@ -224,7 +185,7 @@ export function ChapterListModal({
 
                   {/* Chapter Title */}
                   <Text style={styles.chapterTitle}>
-                    Chapter {chapterNumber}
+                    {chapterNumber}
                   </Text>
 
                   {/* Progress Bar */}
@@ -268,17 +229,6 @@ export function ChapterListModal({
             })}
           </View>
         </ScrollView>
-
-        {/* Reading Plan Suggestion */}
-        <View style={styles.readingPlanContainer}>
-          <Text style={styles.readingPlanTitle}>📖 Suggested Reading Plan</Text>
-          <Text style={styles.readingPlanText}>
-            Complete {book.name} in {Math.ceil(book.chapters / 7)} weeks by reading 1 chapter daily
-          </Text>
-          <TouchableOpacity style={styles.startPlanButton}>
-            <Text style={styles.startPlanText}>Start Reading Plan</Text>
-          </TouchableOpacity>
-        </View>
       </SafeAreaView>
     </Modal>
   );
@@ -315,64 +265,6 @@ const styles = StyleSheet.create({
     fontSize: 18,
     fontWeight: 'bold',
     color: '#8B4513',
-  },
-  bookSubtitle: {
-    fontSize: 12,
-    color: '#D2691E',
-    marginTop: 2,
-  },
-  bulkButton: {
-    backgroundColor: '#FF8C42',
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 15,
-  },
-  bulkButtonText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
-  },
-  statsContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-around',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 16,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  statItem: {
-    alignItems: 'center',
-  },
-  statValue: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    color: '#FF8C42',
-    marginBottom: 4,
-  },
-  statLabel: {
-    fontSize: 10,
-    color: '#D2691E',
-    fontWeight: '600',
-  },
-  exportBookButton: {
-    backgroundColor: '#50C878',
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderRadius: 15,
-    gap: 4,
-  },
-  exportBookText: {
-    color: '#FFFFFF',
-    fontSize: 12,
-    fontWeight: '600',
   },
   bulkActionsContainer: {
     flexDirection: 'row',
@@ -524,41 +416,6 @@ const styles = StyleSheet.create({
   statusText: {
     color: '#FFFFFF',
     fontSize: 8,
-    fontWeight: '600',
-  },
-  readingPlanContainer: {
-    backgroundColor: '#FFFFFF',
-    margin: 16,
-    padding: 16,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
-  },
-  readingPlanTitle: {
-    fontSize: 16,
-    fontWeight: 'bold',
-    color: '#8B4513',
-    textAlign: 'center',
-    marginBottom: 8,
-  },
-  readingPlanText: {
-    fontSize: 14,
-    color: '#D2691E',
-    textAlign: 'center',
-    marginBottom: 12,
-  },
-  startPlanButton: {
-    backgroundColor: '#4A90E2',
-    paddingVertical: 10,
-    borderRadius: 15,
-    alignItems: 'center',
-  },
-  startPlanText: {
-    color: '#FFFFFF',
-    fontSize: 14,
     fontWeight: '600',
   },
 });
