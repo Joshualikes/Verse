@@ -54,6 +54,29 @@ export default function StorytellingScreen() {
     );
   };
 
+<<<<<<< HEAD
+=======
+  const handleChapterChange = (newChapterNumber: number) => {
+    setCurrentChapter(newChapterNumber);
+  };
+
+  const handleExportBook = (bookId: number) => {
+    Alert.alert(
+      'Export Book',
+      `Export entire book as PDF?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Export', 
+          onPress: () => {
+            console.log('Exporting book:', bookId);
+            Alert.alert('Success', 'Book exported successfully!');
+          }
+        }
+      ]
+    );
+  };
+>>>>>>> 7f9f56aa1c473c5ce0ae3c69bb1bc70002634d14
 
   return (
     <View style={[styles.container, { paddingTop: insets.top, paddingBottom: insets.bottom + 100 }]}>
@@ -124,7 +147,11 @@ export default function StorytellingScreen() {
         chapterNumber={currentChapter}
         onProgressUpdate={handleProgressUpdate}
         onComplete={handleChapterComplete}
+<<<<<<< HEAD
         onChapterChange={(newChapter) => setCurrentChapter(newChapter)}
+=======
+        onChapterChange={handleChapterChange}
+>>>>>>> 7f9f56aa1c473c5ce0ae3c69bb1bc70002634d14
       />
     </View>
   );

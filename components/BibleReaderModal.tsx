@@ -10,15 +10,18 @@ import {
   Alert
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { 
-  X, 
-  Play, 
+import {
+  X,
+  Play,
   Pause,
   SkipBack,
   SkipForward,
   Volume2,
   VolumeX,
   Bookmark,
+  Share,
+  Download,
+  Palette,
   Settings,
   Sun,
   Moon,
@@ -51,7 +54,6 @@ interface BibleReaderModalProps {
   chapterNumber: number;
   onProgressUpdate: (bookId: number, chapterNumber: number, progress: number) => void;
   onComplete: (bookId: number, chapterNumber: number) => void;
-  onChapterChange?: (chapterNumber: number) => void;
 }
 
 export function BibleReaderModal({
@@ -67,9 +69,6 @@ export function BibleReaderModal({
   const [audioEnabled, setAudioEnabled] = useState(true);
   const [sound, setSound] = useState<Audio.Sound | null>(null);
   const [readingProgress, setReadingProgress] = useState(0);
-  const [fontSize, setFontSize] = useState(16);
-  const [isDarkMode, setIsDarkMode] = useState(false);
-  const [showSettings, setShowSettings] = useState(false);
   const [isBookmarked, setIsBookmarked] = useState(false);
   const [readingTime, setReadingTime] = useState(0);
   const [startTime, setStartTime] = useState<number | null>(null);
@@ -234,26 +233,34 @@ const toggleAudio = async () => {
     setReadingProgress(Math.max(0, Math.min(100, scrollProgress)));
   };
 
-
-  const handlePreviousChapter = () => {
-    if (book && chapterNumber > 1 && onChapterChange) {
-      setReadingProgress(0);
-      setReadingTime(0);
-      onChapterChange(chapterNumber - 1);
-    }
+  const exportChapter = () => {
+    Alert.alert(
+      'Export Chapter',
+      `Export ${book?.name} Chapter ${chapterNumber} as PDF?`,
+      [
+        { text: 'Cancel', style: 'cancel' },
+        { 
+          text: 'Export', 
+          onPress: () => {
+            console.log('Exporting chapter:', book?.id, chapterNumber);
+            Alert.alert('Success', 'Chapter exported successfully!');
+          }
+        }
+      ]
+    );
   };
 
-  const handleNextChapter = () => {
-    if (book && chapterNumber < book.chapters && onChapterChange) {
-      setReadingProgress(0);
-      setReadingTime(0);
-      onChapterChange(chapterNumber + 1);
-    }
+  const shareChapter = () => {
+    Alert.alert('Share', `Share ${book?.name} Chapter ${chapterNumber} with others?`);
+  };
+
+  const openColoringPage = () => {
+    Alert.alert('Coloring Page', `Open coloring page for ${book?.name} Chapter ${chapterNumber}?`);
   };
 
   if (!book) return null;
 
-  const themeStyles = isDarkMode ? darkTheme : lightTheme;
+  const themeStyles = lightTheme;
 
   return (
     <Modal visible={visible} animationType="slide" presentationStyle="fullScreen">
@@ -269,12 +276,7 @@ const toggleAudio = async () => {
               Chapter {chapterNumber}
             </Text>
           </View>
-          <TouchableOpacity 
-            style={styles.headerButton} 
-            onPress={() => setShowSettings(!showSettings)}
-          >
-            <Settings color={themeStyles.text.color} size={20} />
-          </TouchableOpacity>
+          <View style={styles.headerSpacer} />
         </View>
 
         {/* Progress Bar */}
@@ -287,43 +289,6 @@ const toggleAudio = async () => {
           </Text>
         </View>
 
-        {/* Settings Panel */}
-        {showSettings && (
-          <View style={[styles.settingsPanel, themeStyles.panel]}>
-            <View style={styles.settingsRow}>
-              <Text style={[styles.settingsLabel, themeStyles.text]}>Font Size</Text>
-              <View style={styles.fontControls}>
-                <TouchableOpacity 
-                  style={styles.fontButton}
-                  onPress={() => setFontSize(Math.max(12, fontSize - 2))}
-                >
-                  <Minus color={themeStyles.text.color} size={16} />
-                </TouchableOpacity>
-                <Text style={[styles.fontSizeText, themeStyles.text]}>{fontSize}</Text>
-                <TouchableOpacity 
-                  style={styles.fontButton}
-                  onPress={() => setFontSize(Math.min(24, fontSize + 2))}
-                >
-                  <Plus color={themeStyles.text.color} size={16} />
-                </TouchableOpacity>
-              </View>
-            </View>
-            <View style={styles.settingsRow}>
-              <Text style={[styles.settingsLabel, themeStyles.text]}>Theme</Text>
-              <TouchableOpacity 
-                style={styles.themeButton}
-                onPress={() => setIsDarkMode(!isDarkMode)}
-              >
-                {isDarkMode ? (
-                  <Sun color="#FFD700" size={20} />
-                ) : (
-                  <Moon color="#4A90E2" size={20} />
-                )}
-              </TouchableOpacity>
-            </View>
-          </View>
-        )}
-
         {/* Content */}
         <ScrollView 
           style={styles.contentContainer}
@@ -332,7 +297,7 @@ const toggleAudio = async () => {
           showsVerticalScrollIndicator={false}
         >
           <View style={styles.content}>
-            <Text style={[styles.chapterContent, themeStyles.text, { fontSize }]}>
+            <Text style={[styles.chapterContent, themeStyles.text]}>
               {chapterContent}
             </Text>
           </View>
@@ -385,7 +350,7 @@ const toggleAudio = async () => {
 
         {/* Navigation */}
         <View style={[styles.navigation, themeStyles.panel]}>
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.navButton, chapterNumber <= 1 && styles.disabledNavButton]}
             disabled={chapterNumber <= 1}
             onPress={handlePreviousChapter}
@@ -399,7 +364,7 @@ const toggleAudio = async () => {
             {chapterNumber} / {book.chapters}
           </Text>
 
-          <TouchableOpacity 
+          <TouchableOpacity
             style={[styles.navButton, chapterNumber >= book.chapters && styles.disabledNavButton]}
             disabled={chapterNumber >= book.chapters}
             onPress={handleNextChapter}
@@ -422,14 +387,6 @@ const lightTheme = {
   secondaryText: { color: '#D2691E' }
 };
 
-const darkTheme = {
-  container: { backgroundColor: '#2F2F2F' },
-  header: { backgroundColor: '#1F1F1F' },
-  panel: { backgroundColor: '#1F1F1F' },
-  text: { color: '#F5F5DC' },
-  secondaryText: { color: '#D2B48C' }
-};
-
 const styles = StyleSheet.create({
   container: {
     flex: 1,
@@ -450,6 +407,9 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 20,
     backgroundColor: '#F7D154',
+  },
+  headerSpacer: {
+    width: 40,
   },
   headerCenter: {
     flex: 1,
@@ -484,48 +444,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontWeight: '600',
   },
-  settingsPanel: {
-    marginHorizontal: 16,
-    marginBottom: 8,
-    padding: 16,
-    borderRadius: 15,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  settingsRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  settingsLabel: {
-    fontSize: 16,
-    fontWeight: '600',
-  },
-  fontControls: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 12,
-  },
-  fontButton: {
-    backgroundColor: '#F7D154',
-    borderRadius: 12,
-    padding: 6,
-  },
-  fontSizeText: {
-    fontSize: 16,
-    fontWeight: '600',
-    minWidth: 24,
-    textAlign: 'center',
-  },
-  themeButton: {
-    backgroundColor: '#F7D154',
-    borderRadius: 12,
-    padding: 8,
-  },
   contentContainer: {
     flex: 1,
     paddingHorizontal: 16,
@@ -534,6 +452,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
   },
   chapterContent: {
+    fontSize: 16,
     lineHeight: 28,
     textAlign: 'justify',
   },
